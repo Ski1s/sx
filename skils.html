@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blackjack Game</title>
+  <style>
+    .container {
+      text-align: center;
+    }
+    .card {
+      width: 100px;
+      height: 150px;
+      background-color: white;
+      border: 1px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 10px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Blackjack Game</h1>
+    <h3 id="player-score">Player: 0</h3>
+    <div id="player-hand"></div>
+    <h3 id="dealer-score">Dealer: 0</h3>
+    <div id="dealer-hand"></div>
+    <button id="deal-button" onclick="deal()">Показать</button>
+    <button id="hit-button" onclick="hit()">Взять</button>
+    <button id="stand-button" onclick="stand()">Раскрыться</button>
+    <button id="restart-button" onclick="restart()">Restart</button>
+    <h2 id="result"></h2>
+  </div>
+
+  <script>
+    let playerHand = [];
+    let dealerHand = [];
+    let deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11];
+
+    function deal() {
+      document.getElementById('deal-button').disabled = true;
+      playerHand = [getCard(), getCard()];
+      dealerHand = [getCard(), getCard()];
+      displayPlayerHand();
+      displayDealerHand(true);
+      updateScores();
+      checkBlackjack();
+    }
+
+    function getCard() {
+      return deck[Math.floor(Math.random() * 13)];
+    }
+
+    function displayPlayerHand() {
+      document.getElementById('player-hand').innerHTML = '';
+      playerHand.forEach(card => {
+        let div = document.createElement('div');
+        div.textContent = card;
+        div.classList.add('card');
+        document.getElementById('player-hand').appendChild(div);
+      });
+    }
+
+    function displayDealerHand(hidden) {
+      document.getElementById('dealer-hand').innerHTML = '';
+      dealerHand.forEach((card, index) => {
+        let div = document.createElement('div');
+        div.textContent = index === 0 && hidden ? 'Hidden' : card;
+        div.classList.add('card');
+        document.getElementById('dealer-hand').appendChild(div);
+      });
+    }
+
+    function updateScores() {
+      document.getElementById('player-score').textContent = `Player: ${getHandValue(playerHand)}`;
+      document.getElementById('dealer-score').textContent = `Dealer: ${getHandValue(dealerHand)}`;
+    }
+
+    function hit() {
+      playerHand.push(getCard());
+      displayPlayerHand();
+      updateScores();
+      checkPlayerBust();
+    }
+
+    function stand() {
+      while(getHandValue(dealerHand) < 17) {
+        dealerHand.push(getCard());
+      }
+      displayDealerHand(false);
+      updateScores();
+      determineWinner();
+    }
+
+    function getHandValue(hand) {
+      let sum = hand.reduce((acc, val) => acc + val, 0);
+      if (hand.includes(11) && sum > 21) {
+        sum -= 10;
+      }
+      return sum;
+    }
+
+    function checkBlackjack() {
+      if (getHandValue(playerHand) === 21) {
+        document.getElementById('result').textContent = 'Blackjack! You win!';
+      }
+    }
+
+    function checkPlayerBust() {
+      if (getHandValue(playerHand) > 21) {
+        document.getElementById('result').textContent = 'Player busts! Dealer wins!';
+      }
+    }
+
+    function determineWinner() {
+      let playerValue = getHandValue(playerHand);
+      let dealerValue = getHandValue(dealerHand);
+
+      if (playerValue > 21) {
+        document.getElementById('result').textContent = 'Player busts! Dealer wins!';
+      } else if (dealerValue > 21) {
+        document.getElementById('result').textContent = 'Dealer busts! Player wins!';
+      } else if (playerValue > dealerValue) {
+        document.getElementById('result').textContent = 'Player wins!';
+      } else if (playerValue < dealerValue) {
+        document.getElementById('result').textContent = 'Dealer wins!';
+      } else {
+        document.getElementById('result').textContent = 'It\'s a tie!';
+      }
+    }
+
+    function restart() {
+      document.getElementById('deal-button').disabled = false;
+      playerHand = [];dealerHand = [];
+      document.getElementById('player-hand').innerHTML = '';
+      document.getElementById('dealer-hand').innerHTML = '';
+      document.getElementById('player-score').textContent = 'Player: 0';
+      document.getElementById('dealer-score').textContent = 'Dealer: 0';
+      document.getElementById('result').textContent = '';
+    }
+  </script>
+</body>
+</html>
