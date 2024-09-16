@@ -1,144 +1,248 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>skils Game</title>
-  <style>
-    .container {
-      text-align: center;
-    }
-    .card {
-      width: 100px;
-      height: 150px;
-      background-color: white;
-      border: 1px solid black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 10px;
-      font-size: 24px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SX — Простая социальная сеть</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Темный фон страницы */
+            color: #e0e0e0; /* Светлый текст */
+        }
+        .container, .registration {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            background-color: #1e1e1e; /* Темный фон контейнера */
+            border: 1px solid #333;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #e0e0e0; /* Светлый текст заголовка */
+        }
+        .profile, .registration {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile img, .registration img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile h2, .registration h2 {
+            margin: 10px 0;
+            color: #e0e0e0; /* Светлый текст для имени профиля и заголовков регистрации */
+        }
+        .profile input[type="text"], .registration input[type="text"], .registration input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2c2c2c; /* Темный фон для полей ввода */
+            color: #e0e0e0; /* Светлый текст в полях ввода */
+        }
+        .profile button, .registration button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .profile button:hover, .registration button:hover {
+            background-color: #0056b3;
+        }
+        .post-form {
+            margin-bottom: 20px;
+        }
+        .post-form input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .post-form textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2c2c2c; /* Темный фон для текстового поля */
+            color: #e0e0e0; /* Светлый текст в текстовом поле */
+        }
+        .post-form button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .post-form button:hover {
+            background-color: #0056b3;
+        }
+        .posts {
+            margin-top: 20px;
+        }
+        .post {
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #1e1e1e; /* Темный фон постов */
+        }
+        .post img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        .post p {
+            margin: 10px 0;
+            color: #e0e0e0; /* Светлый текст постов */
+        }
+        .hidden {
+            display: none;
+        }
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Blackjack Game</h1>
-    <h3 id="player-score">Player: 0</h3>
-    <div id="player-hand"></div>
-    <h3 id="dealer-score">Dealer: 0</h3>
-    <div id="dealer-hand"></div>
-    <button id="deal-button" onclick="deal()">Показать</button>
-    <button id="hit-button" onclick="hit()">Взять</button>
-    <button id="stand-button" onclick="stand()">Раскрыться</button>
-    <button id="restart-button" onclick="restart()">Restart</button>
-    <h2 id="result"></h2>
-  </div>
+    <!-- Регистрация -->
+    <div class="registration" id="registrationSection">
+        <h1>SX — Регистрация</h1>
+        <form id="registrationForm">
+            <input type="text" id="username" placeholder="Имя пользователя" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <input type="password" id="confirmPassword" placeholder="Подтвердите пароль" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+    
+    <!-- Основное содержание -->
+    <div class="container hidden" id="mainSection">
+        <div class="nav-links">
+            <a href="profile.html" target="_blank">Профиль</a>
+        </div>
+        
+        <div class="post-form">
+            <h2>Создать новый пост</h2>
+            <input type="file" id="imageUpload" accept="image/*">
+            <textarea id="caption" placeholder="Напишите подпись..."></textarea>
+            <button onclick="addPost()">Опубликовать</button>
+        </div>
+        
+        <div class="posts" id="postsContainer">
+            <!-- Посты будут отображаться здесь -->
+        </div>
+    </div>
 
-  <script>
-    let playerHand = [];
-    let dealerHand = [];
-    let deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11];
+    <script>
+      // Firebase конфигурация
+      const firebaseConfig = {
+        apiKey: "Ваш API ключ",
+        authDomain: "sx-beta-1a4de.firebaseapp.com",
+        projectId: "sx-beta-1a4de",
+        storageBucket: "sx-beta-1a4de.appspot.com",
+        messagingSenderId: "211780961504",
+        appId: "1:211780961504:web:de13b55f9d2be52cccfc85",
+        measurementId: "G-S2MVN1PMV7",
+        databaseURL: "URL вашей базы данных"
+      };
 
-    function deal() {
-      document.getElementById('deal-button').disabled = true;
-      playerHand = [getCard(), getCard()];
-      dealerHand = [getCard(), getCard()];
-      displayPlayerHand();
-      displayDealerHand(true);
-      updateScores();
-      checkBlackjack();
-    }
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
 
-    function getCard() {
-      return deck[Math.floor(Math.random() * 13)];
-    }
+      // Функция для добавления поста
+      function addPost() {
+          const fileInput = document.getElementById('imageUpload');
+          const captionInput = document.getElementById('caption');
 
-    function displayPlayerHand() {
-      document.getElementById('player-hand').innerHTML = '';
-      playerHand.forEach(card => {
-        let div = document.createElement('div');
-        div.textContent = card;
-        div.classList.add('card');
-        document.getElementById('player-hand').appendChild(div);
+          if (fileInput.files.length === 0 || !captionInput.value.trim()) {
+              alert('Пожалуйста, загрузите изображение и напишите подпись.');
+              return;
+          }
+
+          const file = fileInput.files[0];
+          const reader = new FileReader();
+          reader.onload = function(event) {
+              const imgSrc = event.target.result;
+              const post = {
+                  image: imgSrc,
+                  caption: captionInput.value,
+                  timestamp: new Date().getTime()
+              };
+
+              // Сохранение поста в Firebase
+              db.ref('posts').push(post);
+
+              // Отображение поста
+              renderPost(post);
+
+              // Очистка полей
+              fileInput.value = '';
+              captionInput.value = '';
+          };
+          reader.readAsDataURL(file);
+      }
+
+      // Функция для отображения поста
+      function renderPost(post) {
+          const postsContainer = document.getElementById('postsContainer');
+          const postHtml = `
+              <div class="post">
+                  <img src="${post.image}" alt="Post Image">
+                  <p>${post.caption}</p>
+              </div>
+          `;
+          postsContainer.innerHTML += postHtml;
+      }
+
+      // Загрузка постов из Firebase
+      document.addEventListener('DOMContentLoaded', function() {
+          db.ref('posts').on('value', (snapshot) => {
+              const postsContainer = document.getElementById('postsContainer');
+              postsContainer.innerHTML = ''; // Очищаем контейнер перед загрузкой
+              const posts = snapshot.val();
+              for (let key in posts) {
+                  renderPost(posts[key]);
+              }
+          });
       });
-    }
 
-    function displayDealerHand(hidden) {
-      document.getElementById('dealer-hand').innerHTML = '';
-      dealerHand.forEach((card, index) => {
-        let div = document.createElement('div');
-        div.textContent = index === 0 && hidden ? 'Hidden' : card;
-        div.classList.add('card');
-        document.getElementById('dealer-hand').appendChild(div);
+      // Обработка формы регистрации
+      document.getElementById('registrationForm').addEventListener('submit', function(event) {
+          event.preventDefault();const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          if (password !== confirmPassword) {
+              alert('Пароли не совпадают.');
+              return;
+          }
+
+          // Успешная регистрация
+          document.getElementById('registrationSection').classList.add('hidden');
+          document.getElementById('mainSection').classList.remove('hidden');
       });
-    }
-
-    function updateScores() {
-      document.getElementById('player-score').textContent = `Player: ${getHandValue(playerHand)}`;
-      document.getElementById('dealer-score').textContent = `Dealer: ${getHandValue(dealerHand)}`;
-    }
-
-    function hit() {
-      playerHand.push(getCard());
-      displayPlayerHand();
-      updateScores();
-      checkPlayerBust();
-    }
-
-    function stand() {
-      while(getHandValue(dealerHand) < 17) {
-        dealerHand.push(getCard());
-      }
-      displayDealerHand(false);
-      updateScores();
-      determineWinner();
-    }
-
-    function getHandValue(hand) {
-      let sum = hand.reduce((acc, val) => acc + val, 0);
-      if (hand.includes(11) && sum > 21) {
-        sum -= 10;
-      }
-      return sum;
-    }
-
-    function checkBlackjack() {
-      if (getHandValue(playerHand) === 21) {
-        document.getElementById('result').textContent = 'Blackjack! You win!';
-      }
-    }
-
-    function checkPlayerBust() {
-      if (getHandValue(playerHand) > 21) {
-        document.getElementById('result').textContent = 'Player busts! Dealer wins!';
-      }
-    }
-
-    function determineWinner() {
-      let playerValue = getHandValue(playerHand);
-      let dealerValue = getHandValue(dealerHand);
-
-      if (playerValue > 21) {
-        document.getElementById('result').textContent = 'Player busts! Dealer wins!';
-      } else if (dealerValue > 21) {
-        document.getElementById('result').textContent = 'Dealer busts! Player wins!';
-      } else if (playerValue > dealerValue) {
-        document.getElementById('result').textContent = 'Player wins!';
-      } else if (playerValue < dealerValue) {
-        document.getElementById('result').textContent = 'Dealer wins!';
-      } else {
-        document.getElementById('result').textContent = 'It\'s a tie!';
-      }
-    }
-
-    function restart() {
-      document.getElementById('deal-button').disabled = false;
-      playerHand = [];dealerHand = [];
-      document.getElementById('player-hand').innerHTML = '';
-      document.getElementById('dealer-hand').innerHTML = '';
-      document.getElementById('player-score').textContent = 'Player: 0';
-      document.getElementById('dealer-score').textContent = 'Dealer: 0';
-      document.getElementById('result').textContent = '';
-    }
-  </script>
+    </script>
 </body>
 </html>
